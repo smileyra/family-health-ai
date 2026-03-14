@@ -26,7 +26,7 @@ const processVoiceCommand = async (req, res) => {
         const patients = await Patient.find({ user: userId });
         const patientContext = patients.map(p => ({ id: p._id.toString(), name: p.name, relationship: p.relationship }));
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
             You are "Healthy Home", an AI medical voice assistant. 

@@ -46,8 +46,8 @@ const analyzeReport = async (req, res) => {
 
         const filePart = fileToGenerativePart(filePath, mimeType);
 
-        // We use gemini-1.5-flash as the best general vision/multimodal model for fast analyses
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // We use gemini-2.5-flash as the best general vision/multimodal model for fast analyses
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
             You are an expert AI medical assistant reviewing a patient's medical document.
@@ -101,7 +101,7 @@ const getHealthInsights = async (req, res) => {
         const vitals = await Vitals.find({ patient: patient._id }).sort({ recordedAt: -1 }).limit(5);
         const medicines = await Medicine.find({ patient: patient._id, isActive: true });
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
             You are a caring, intelligent AI health assistant providing insights for a patient.
