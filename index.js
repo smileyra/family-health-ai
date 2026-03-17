@@ -32,23 +32,14 @@ app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/voice', require('./routes/voiceRoutes'));
 
 // Serve Frontend
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.use(express.static(path.join(__dirname, "frontend/dist")));
 
-    app.get('*', (req, res) =>
-        res.sendFile(
-            path.resolve(__dirname, 'frontend', 'dist', 'index.html')
-        )
-    );
-} else {
-    // Basic Testing Route
-    app.get('/', (req, res) => {
-        res.json({ message: 'Welcome to the Healthy Home AI System API' });
-    });
-}
+app.get("/*path", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });

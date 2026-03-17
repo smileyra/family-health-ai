@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Activity, Bell, Calendar, Home, Pill, Search, Settings, User } from 'lucide-react';
+import { Activity, Bell, Calendar, Home, Pill, Search, Settings, User, Bot } from 'lucide-react';
+import AiChatScanner from './pages/AiChatScanner';
+
+const SidebarLink = ({ to, icon: Icon, label }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+    
+    return (
+        <Link 
+            to={to} 
+            className={`flex items-center px-4 py-3 rounded-xl transition-colors ${isActive ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-100 text-gray-600'}`}
+        >
+            <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+            <span className={`font-medium ${isActive ? 'text-blue-700' : ''}`}>{label}</span>
+        </Link>
+    );
+};
 
 const DashboardLayout = ({ children }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -18,31 +34,17 @@ const DashboardLayout = ({ children }) => {
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
                 <div className="h-16 flex items-center px-6 border-b border-gray-200">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center mr-3 hidden">
-                        <Home className="w-5 h-5 text-white" />
-                    </div>
                     <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
                         Healthy Home
                     </span>
                 </div>
                 
                 <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-                    <Link to="/" className="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-xl transition-colors">
-                        <Home className="w-5 h-5 mr-3 text-blue-600" />
-                        <span className="font-medium text-blue-700">Dashboard</span>
-                    </Link>
-                    <Link to="#" className="flex items-center px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors text-gray-600">
-                        <Activity className="w-5 h-5 mr-3 text-gray-500" />
-                        <span className="font-medium">Vitals</span>
-                    </Link>
-                    <Link to="#" className="flex items-center px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors text-gray-600">
-                        <Pill className="w-5 h-5 mr-3 text-gray-500" />
-                        <span className="font-medium">Medicines</span>
-                    </Link>
-                    <Link to="#" className="flex items-center px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors text-gray-600">
-                        <Calendar className="w-5 h-5 mr-3 text-gray-500" />
-                        <span className="font-medium">Appointments</span>
-                    </Link>
+                    <SidebarLink to="/" icon={Home} label="Dashboard" />
+                    <SidebarLink to="/chat" icon={Bot} label="AI Scanner" />
+                    <SidebarLink to="#" icon={Activity} label="Vitals" />
+                    <SidebarLink to="#" icon={Pill} label="Medicines" />
+                    <SidebarLink to="#" icon={Calendar} label="Appointments" />
                 </nav>
 
                 <div className="p-4 border-t border-gray-200">
@@ -77,11 +79,8 @@ const DashboardLayout = ({ children }) => {
                         </div>
                     </div>
 
-                    
                     {/* Right: Actions AND Date/Time */}
                     <div className="flex items-center space-x-4 md:space-x-6 ml-auto">
-                        
-                        {/* THE CLOCK - Placed at the top right exactly as requested */}
                         <div className="flex flex-col items-end text-right border-r border-gray-200 pr-5">
                             <span className="text-lg font-bold text-gray-800 tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 drop-shadow-sm">
                                 {format(currentTime, 'hh:mm:ss a')}
@@ -168,22 +167,23 @@ const DashboardHome = () => {
                 </div>
 
                 {/* Card 4 - AI Insight */}
-                <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-2xl shadow-indigo-200 shadow-lg text-white relative overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer">
-                     <div className="absolute right-0 top-0 opacity-10">
-                         {/* Abstract Shape */}
-                        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="80" cy="20" r="60" fill="currentColor" />
-                        </svg>
-                     </div>
-                     <div className="relative z-10">
-                        <div className="flex items-center space-x-2 text-indigo-100 mb-2">
-                             <span className="text-xs uppercase font-bold tracking-wider">AI Voice</span>
-                             <span className="w-2 h-2 bg-indigo-300 rounded-full animate-pulse"></span>
-                        </div>
-                        <h3 className="text-lg font-semibold leading-tight mb-2">"Hey Healthy Home, log my blood sugar as 95."</h3>
-                        <p className="text-indigo-200 text-sm opacity-90">Tap to hold & speak to your assistant</p>
-                     </div>
-                </div>
+                <Link to="/chat" className="block w-full">
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-2xl shadow-indigo-200 shadow-lg text-white relative overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer h-full">
+                         <div className="absolute right-0 top-0 opacity-10">
+                            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="80" cy="20" r="60" fill="currentColor" />
+                            </svg>
+                         </div>
+                         <div className="relative z-10">
+                            <div className="flex items-center space-x-2 text-indigo-100 mb-2">
+                                 <span className="text-xs uppercase font-bold tracking-wider">AI Scanner Assistant</span>
+                                 <span className="w-2 h-2 bg-indigo-300 rounded-full animate-pulse"></span>
+                            </div>
+                            <h3 className="text-lg font-semibold leading-tight mb-2">Scan & Chat with your Doc Assistant</h3>
+                            <p className="text-indigo-200 text-sm opacity-90">Tap here to analyze medical reports</p>
+                         </div>
+                    </div>
+                </Link>
             </div>
 
             {/* AI Insights & Charts Placeholder */}
@@ -227,6 +227,7 @@ const App = () => {
             <DashboardLayout>
                 <Routes>
                     <Route path="/" element={<DashboardHome />} />
+                    <Route path="/chat" element={<AiChatScanner />} />
                 </Routes>
             </DashboardLayout>
         </Router>

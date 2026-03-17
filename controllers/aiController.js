@@ -139,7 +139,54 @@ const getHealthInsights = async (req, res) => {
     }
 };
 
+// @desc    Chat with a medical document
+// @route   POST /api/ai/chat-scanner
+// @access  Public (for demo purposes)
+const chatScanner = async (req, res) => {
+    try {
+        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+            return res.status(500).json({ message: 'Gemini API Key is missing.' });
+        }
+
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const { message, chatHistory } = req.body;
+        
+        let promptArgs = [];
+        
+        // Add chat history context if any
+        if (chatHistory) {
+             try {
+                const historyArr = JSON.parse(chatHistory);
+                const stringifiedHistory = historyArr.map(h => `${h.role === 'user' ? 'User' : 'AI'}: ${h.text}`).join('\n');
+                promptArgs.push(`Here is the previous chat context:\n${stringifiedHistory}\n\n`);
+             } catch(e) { }
+        }
+
+        // Add user's new message
+        promptArgs.push(`User asks: ${message || 'Please analyze this medical document in detail and tell me what it means.'}\nPlease answer as a helpful, caring, and professional medical AI bot. Remember to add a disclaimer at the end that you are an AI and the user should consult a real doctor.`);
+
+        if (req.file) {
+             const filePath = req.file.path;
+             let mimeType = req.file.mimetype;
+             if (filePath.endsWith('.pdf')) mimeType = 'application/pdf';
+             const filePart = fileToGenerativePart(filePath, mimeType);
+             promptArgs.push(filePart);
+        }
+
+        const result = await model.generateContent(promptArgs);
+        const response = await result.response;
+        const textSummary = response.text();
+        
+        res.json({ reply: textSummary });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error in chat scanner', error: error.message });
+    }
+};
+
 module.exports = {
     analyzeReport,
-    getHealthInsights
+    getHealthInsights,
+    chatScanner
 };
